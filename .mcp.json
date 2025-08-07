@@ -3,11 +3,7 @@
     "typescript": {
       "type": "stdio",
       "command": "pnpx",
-      "args": [
-        "@mizchi/lsmcp",
-        "-p",
-        "typescript"
-      ],
+      "args": ["@mizchi/lsmcp", "-p", "typescript"],
       "env": {}
     }
   }
