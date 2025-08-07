@@ -11,6 +11,12 @@ datasource db {
   shadowDatabaseUrl = env("ADMIN_SHADOW_DATABASE_URL")
 }
 
+generator fabbrica {
+  provider    = "prisma-fabbrica"
+  output      = "../src/infrastructure/postgres/__test__/fabbrica.gen"
+  noTranspile = true
+}
+
 model Tenant {
   id        String   @id @default(uuid(7)) @db.Uuid
   name      String
