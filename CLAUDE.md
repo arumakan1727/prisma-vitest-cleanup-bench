@@ -1,4 +1,5 @@
-# CLAUDE.md
+<lang>Japanese</lang>
+<character_encode>UTF-8</character_encode>
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -10,27 +11,6 @@ This is a TypeScript benchmarking project that tests different database cleanup 
 - Method C: Single transaction with SAVEPOINT/ROLLBACK for each test (no parallel execution)
 
 ## Commands
-
-### Development Infrastructure
-```bash
-# Start PostgreSQL with Docker/Podman
-task docker:up    # or task podman:up
-
-# Stop containers
-task docker:down  # or task podman:down
-
-# View container status
-task docker:ps    # or task podman:ps
-```
-
-### Database Management
-```bash
-# Apply Prisma migrations to test database
-pnpm prisma migrate deploy
-
-# Generate Prisma client
-pnpm prisma generate
-```
 
 ### Code Quality
 ```bash
@@ -113,8 +93,12 @@ export const UserEmail = { parse: ... };
 export const zUserName = z.string().min(1).max(20).brand<'UserName'>();
 ```
 
-### DTO Patterns with Discriminated Unions
-DTOs use discriminated unions for status/type -based variations:
+### Discriminated Unions
+Prefer use strict & expressive type definition.
+User loves discriminatedUnion.
+
+**Don't use `any`, `as`.**
+
 ```typescript
 // Example from src/core/user/usecase/dto.ts
 const zUserActiveDto = z.object({
@@ -138,23 +122,13 @@ export const UserDto = { parse: zodParse(zUserDto) };
 The project uses a custom `zodParser` helper (src/core/+shared/helpers/zod.ts):
 ```typescript
 export const zodParser = <T extends z.ZodType>(schema: T) => {
-  return (x: z.input<T>): z.output<T> => {
-    return schema.parse(x);  // TODO: Domain Error で wrap する
-  };
+  return (x: z.input<T>): z.output<T> => { ... };
 };
 ```
 
-### Data Conversion Pattern
-Converters validate data transformations from Prisma to DTOs:
-```typescript
-// Example from infrastructure layer
-export const toUserDto = (user: $User): UserDto => {
-  if (user.active) {
-    return UserDto.parse({ status: 'active', ... });
-  }
-  return UserDto.parse({ status: 'deleted', ... });
-};
-```
+### Companion object
+Each zod schemas has Comanion Object.
+It has `parse` function.
 
 ### Environment Configuration
 Environment variables are validated at startup:
@@ -166,17 +140,19 @@ const zEnv = z.object({
 export const env = zEnv.parse(process.env);
 ```
 
-## Key Technologies
-- **TypeScript**: With strict type checking
-- **Prisma**: ORM with migrations and type-safe client
-- **Vitest**: Test runner with project-based configuration
-- **Biome**: Linter and formatter
-- **Zod**: Runtime schema validation with branded types
-- **Task**: Task runner for container operations
-- **pnpm**: Package manager
+## Coding workflow
 
-## Testing Notes
-- Tests use `@quramy/prisma-fabbrica` for test data generation
-- Global setup handles migrations before test runs
-- Each test method has its own setup file and configuration
-- RLS bypass is available through `bypassRlsPrisma` for test cleanup
+1. Search related files: List sibling files, parent files, children files.
+2. Write code
+3. `pnpm typechk`
+4. `pnpm fix`
+5. run test
+6. Refactor
+
+## MCP Servers
+
+Using MCP Server well can help users. Please use it often.
+
+### typescript LSP MCP (lsmcp)
+
+LSP 機能やコード編集、メモリ機能など。ファイル全体を読み込んだりするよりも効率的なので積極的に使う。
