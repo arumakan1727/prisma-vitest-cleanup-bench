@@ -6,6 +6,9 @@
   "private": true,
   "main": "index.js",
   "scripts": {
+    "fix": "biome check --write",
+    "fix:unsafe": "biome check --write --unsafe",
+    "typechk": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
