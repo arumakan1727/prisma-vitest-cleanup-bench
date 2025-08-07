@@ -17,21 +17,21 @@ initialize({
   },
 });
 
-export const tenantFactory = defineTenantFactory({
+export const TenantFactory = defineTenantFactory({
   defaultData: async ({ seq }) => ({
     name: `Test Tenant ${seq}`,
   }),
 });
 
-export const userFactory = defineUserFactory({
+export const UserFactory = defineUserFactory({
   defaultData: async ({ seq }) => ({
-    tenant: tenantFactory,
+    tenant: TenantFactory,
     name: `User ${seq}`,
   }),
   traits: {
     ACTIVE: {
       onAfterCreate: async (user) => {
-        await userActiveFactory.create({
+        await UserActiveFactory.create({
           tenant: { connect: { id: user.tenantId } },
           user: { connect: user },
         });
@@ -39,7 +39,7 @@ export const userFactory = defineUserFactory({
     },
     DELETED: {
       onAfterCreate: async (user) => {
-        await userDeletedFactory.create({
+        await UserDeletedFactory.create({
           tenant: { connect: { id: user.tenantId } },
           user: { connect: user },
         });
@@ -48,37 +48,37 @@ export const userFactory = defineUserFactory({
   },
 });
 
-// 子テーブルは export しない (userFactory の traits で user と一緒に create する)
-const userActiveFactory = defineUserActiveFactory({
+// 子テーブルは export しない (UserFactory の traits で user と一緒に create する)
+const UserActiveFactory = defineUserActiveFactory({
   defaultData: async ({ seq }) => ({
-    tenant: tenantFactory,
-    user: userFactory,
+    tenant: TenantFactory,
+    user: UserFactory,
     email: `user${seq}@example.com`,
   }),
 });
 
-// 子テーブルは export しない (userFactory の traits で user と一緒に create する)
-const userDeletedFactory = defineUserDeletedFactory({
+// 子テーブルは export しない (UserFactory の traits で user と一緒に create する)
+const UserDeletedFactory = defineUserDeletedFactory({
   defaultData: async () => ({
-    tenant: tenantFactory,
-    user: userFactory,
+    tenant: TenantFactory,
+    user: UserFactory,
   }),
 });
 
-export const articleFactory = defineArticleFactory({
+export const ArticleFactory = defineArticleFactory({
   defaultData: async ({ seq }) => ({
-    tenant: tenantFactory,
-    author: userFactory,
+    tenant: TenantFactory,
+    author: UserFactory,
     title: `Article ${seq}`,
     content: `Article content ${seq}`,
   }),
 });
 
-export const commentFactory = defineCommentFactory({
+export const CommentFactory = defineCommentFactory({
   defaultData: async ({ seq }) => ({
-    tenant: tenantFactory,
-    article: articleFactory,
-    author: userFactory,
+    tenant: TenantFactory,
+    article: ArticleFactory,
+    author: UserFactory,
     content: `Comment ${seq}`,
   }),
 });

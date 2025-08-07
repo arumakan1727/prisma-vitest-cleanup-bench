@@ -4,7 +4,7 @@ import { TenantId } from '~/core/tenant/value-object';
 import { PrismaTxExecutor } from '../../prisma';
 import { ArticleRepository } from '../../repository/article';
 import { truncate } from '../+global-setup';
-import { articleFactory, commentFactory, tenantFactory, userFactory } from '../factory';
+import { ArticleFactory, CommentFactory, TenantFactory, UserFactory } from '../factory';
 import { testEnv } from '../test-env';
 
 describe('ArticleRepository', () => {
@@ -29,16 +29,16 @@ describe('ArticleRepository', () => {
 
     repeatTest('存在する記事を正常に取得できる', async () => {
       // Arrange
-      const tenant = await tenantFactory.create();
+      const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
 
-      const author = await userFactory.use('ACTIVE').create({
+      const author = await UserFactory.use('ACTIVE').create({
         tenant: {
           connect: tenant,
         },
       });
 
-      const article = await articleFactory.create({
+      const article = await ArticleFactory.create({
         tenant: {
           connect: tenant,
         },
@@ -51,13 +51,13 @@ describe('ArticleRepository', () => {
       const articleId = ArticleId.parse(article.id);
 
       // コメントも作成
-      const commentAuthor = await userFactory.use('ACTIVE').create({
+      const commentAuthor = await UserFactory.use('ACTIVE').create({
         tenant: {
           connect: tenant,
         },
       });
 
-      await commentFactory.create({
+      await CommentFactory.create({
         tenant: {
           connect: tenant,
         },
@@ -91,7 +91,7 @@ describe('ArticleRepository', () => {
 
     repeatTest('存在しない記事IDの場合はnullを返す', async () => {
       // Arrange
-      const tenant = await tenantFactory.create();
+      const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
       const nonExistentId = ArticleId.parse(999999);
 
@@ -106,16 +106,16 @@ describe('ArticleRepository', () => {
 
     repeatTest('異なるTenantの記事は取得できない', async () => {
       // Arrange
-      const tenant1 = await tenantFactory.create({ name: 'Tenant 1' });
-      const tenant2 = await tenantFactory.create({ name: 'Tenant 2' });
+      const tenant1 = await TenantFactory.create({ name: 'Tenant 1' });
+      const tenant2 = await TenantFactory.create({ name: 'Tenant 2' });
       const tenant2Id = TenantId.parse(tenant2.id);
 
-      const author = await userFactory.use('ACTIVE').create({
+      const author = await UserFactory.use('ACTIVE').create({
         tenant: {
           connect: tenant1,
         },
       });
-      const article = await articleFactory.create({
+      const article = await ArticleFactory.create({
         tenant: {
           connect: tenant1,
         },
