@@ -3,7 +3,7 @@ import { zodParser } from '~/core/+shared/helpers/zod';
 import { zUserEmail, zUserId, zUserName } from '../value-object';
 
 const zUserActiveDto = z.object({
-  status: z.literal('active'),
+  status: z.literal('ACTIVE'),
   id: zUserId,
   name: zUserName,
   email: zUserEmail,
@@ -11,7 +11,7 @@ const zUserActiveDto = z.object({
 export type UserActiveDto = z.infer<typeof zUserActiveDto>;
 
 const zUserDeletedDto = z.object({
-  status: z.literal('deleted'),
+  status: z.literal('DELETED'),
   name: zUserName,
 });
 export type UserDeletedDto = z.infer<typeof zUserDeletedDto>;

@@ -11,7 +11,7 @@ type $User = Prisma.UserGetPayload<{
 export const toUserDto = (user: $User): UserDto => {
   if (user.active) {
     return UserDto.parse({
-      status: 'active',
+      status: 'ACTIVE',
       id: user.id,
       email: user.active.email,
       name: user.name,
@@ -19,7 +19,7 @@ export const toUserDto = (user: $User): UserDto => {
   }
 
   return UserDto.parse({
-    status: 'deleted',
+    status: 'DELETED',
     name: user.name,
   });
 };
