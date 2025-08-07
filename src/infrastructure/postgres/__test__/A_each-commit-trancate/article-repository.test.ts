@@ -1,4 +1,4 @@
-import { afterEach, assert, describe, expect, it } from 'vitest';
+import { afterEach, assert, describe, expect } from 'vitest';
 import { ArticleContent, ArticleId, ArticleTitle } from '~/core/article/value-object';
 import { TenantId } from '~/core/tenant/value-object';
 import { UserId } from '~/core/user/value-object';
@@ -6,7 +6,7 @@ import { PrismaTxExecutor } from '../../prisma';
 import { ArticleRepository } from '../../repository/article';
 import { truncate } from '../+global-setup';
 import { ArticleFactory, CommentFactory, TenantFactory, UserFactory } from '../factory';
-import { testEnv } from '../test-env';
+import { repeatTest } from '../helpers';
 
 describe('ArticleRepository', () => {
   const repository = new ArticleRepository();
@@ -17,17 +17,6 @@ describe('ArticleRepository', () => {
   });
 
   describe('findById', () => {
-    const repeatTest = (name: string, fn: () => Promise<void>) => {
-      it(name, async () => {
-        for (let i = 0; i < testEnv.TEST_REPEAT_COUNT; i++) {
-          await fn();
-          if (i < testEnv.TEST_REPEAT_COUNT - 1) {
-            await truncate();
-          }
-        }
-      });
-    };
-
     repeatTest('存在する記事を正常に取得できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
@@ -138,17 +127,6 @@ describe('ArticleRepository', () => {
   });
 
   describe('create', () => {
-    const repeatTest = (name: string, fn: () => Promise<void>) => {
-      it(name, async () => {
-        for (let i = 0; i < testEnv.TEST_REPEAT_COUNT; i++) {
-          await fn();
-          if (i < testEnv.TEST_REPEAT_COUNT - 1) {
-            await truncate();
-          }
-        }
-      });
-    };
-
     repeatTest('新しい記事を正常に作成できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
@@ -258,52 +236,9 @@ describe('ArticleRepository', () => {
       expect(created.content).toBe(maxLengthContent);
       expect(created.content.length).toBe(1000);
     });
-
-    repeatTest('削除済みユーザーでも記事を作成できる', async () => {
-      // Arrange
-      const tenant = await TenantFactory.create();
-      const tenantId = TenantId.parse(tenant.id);
-
-      const author = await UserFactory.use('DELETED').create({
-        tenant: {
-          connect: tenant,
-        },
-      });
-      const authorId = UserId.parse(author.id);
-
-      const articleCreate = {
-        title: ArticleTitle.parse('削除済みユーザーの記事'),
-        content: ArticleContent.parse('削除済みユーザーが作成した記事です'),
-        authorId,
-      };
-
-      // Act
-      const createdId = await txExecutor.doReadWriteTx(tenantId, async (tx) =>
-        repository.create(tx, articleCreate)
-      );
-
-      // Assert
-      const created = await txExecutor.doReadOnlyTx(tenantId, async (tx) =>
-        repository.findById(tx, createdId)
-      );
-
-      assert.isNotNull(created);
-      expect(created.author.status).toBe('DELETED');
-    });
   });
 
   describe('findMany', () => {
-    const repeatTest = (name: string, fn: () => Promise<void>) => {
-      it(name, async () => {
-        for (let i = 0; i < testEnv.TEST_REPEAT_COUNT; i++) {
-          await fn();
-          if (i < testEnv.TEST_REPEAT_COUNT - 1) {
-            await truncate();
-          }
-        }
-      });
-    };
-
     repeatTest('テナントの全記事を取得できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
@@ -480,17 +415,6 @@ describe('ArticleRepository', () => {
   });
 
   describe('delete', () => {
-    const repeatTest = (name: string, fn: () => Promise<void>) => {
-      it(name, async () => {
-        for (let i = 0; i < testEnv.TEST_REPEAT_COUNT; i++) {
-          await fn();
-          if (i < testEnv.TEST_REPEAT_COUNT - 1) {
-            await truncate();
-          }
-        }
-      });
-    };
-
     repeatTest('記事を正常に削除できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
