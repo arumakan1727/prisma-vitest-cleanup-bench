@@ -30,7 +30,7 @@ const migrate = () => {
 export const truncate = async () => {
   // TRUNCATE は DELETE と異なりスキャンしないので高速。
   // CASCADE すると子孫テーブルも TRUNCATE される。
-  await bypassRlsPrisma.$executeRaw`TRUNCATE TABLE "Tenant" RESTART IDENTITY CASCADE`;
+  await bypassRlsPrisma.$executeRaw`TRUNCATE TABLE "tenants" RESTART IDENTITY CASCADE`;
 };
 
 const disconnect = async () => {
