@@ -4,6 +4,7 @@ pnpm = '10'  # 実際に使うバージョンは package.json の packageManager
 
 'aqua:BurntSushi/ripgrep' = 'latest'
 task = 'latest' # タスクランナー
+'npm:@anthropic-ai/claude-code' = "latest"
 
 [settings]
 pipx.uvx = true # tools の 'pip:*' を pipx ではなく uvx でインストールする
