@@ -50,7 +50,10 @@
         "useAwait": "off"
       },
       "a11y": "error",
-      "complexity": "error",
+      "complexity": {
+        "recommended": true,
+        "useLiteralKeys": "off" // tsconfig の noPropertyAccessFromIndexSignature と競合するので off
+      },
       "performance": {
         "recommended": true,
         "noNamespaceImport": "off"
