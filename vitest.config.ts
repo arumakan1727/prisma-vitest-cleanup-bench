@@ -17,7 +17,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'A',
-          include: ['src/infrastructure/postgres/__test__/A_each-commit-trancate/**/*.ts'],
+          include: ['src/infrastructure/postgres/__test__/A_each-commit-trancate/**/*.test.ts'],
           setupFiles:
             './src/infrastructure/postgres/__test__/A_each-commit-trancate/+each-file-setup.ts',
           globalSetup: './src/infrastructure/postgres/__test__/+global-setup.ts',
