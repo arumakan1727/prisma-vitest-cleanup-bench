@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("ADMIN_DATABASE_URL")
+  shadowDatabaseUrl = env("ADMIN_SHADOW_DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  name      String
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  // back ref
+  users    User[]
+  userActives UserActive[]
+  userDeleted UserDeleted[]
+  articles Article[]
+  comments Comment[]
+
+  @@map("tenants")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  tenantId  String   @db.Uuid
+  name      String
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  // FK
+  tenant   Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  // back ref
+  active   UserActive?
+  deleted  UserDeleted?
+  articles Article[]
+  comments Comment[]
+
+  @@map("users")
+}
+
+model UserActive {
+  userId Int    @id @default(autoincrement())
+  tenantId String @db.Uuid
+  email  String @unique @db.Citext
+
+  // FK
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_actives")
+}
+
+model UserDeleted {
+  userId    Int      @id @default(autoincrement())
+  tenantId  String   @db.Uuid
+  deletedAt DateTime @default(now()) @db.Timestamptz
+  reason    String
+
+  // FK
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_deleted")
+}
+
+// Article table
+model Article {
+  id        Int      @id @default(autoincrement())
+  tenantId  String   @db.Uuid
+  authorId  Int
+  title     String
+  content   String
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  // FK
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  // back ref
+  comments Comment[]
+
+  @@map("articles")
+}
+
+// Comment table
+model Comment {
+  id        Int      @id @default(autoincrement())
+  tenantId  String   @db.Uuid
+  articleId Int
+  authorId  Int
+  content   String
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  // FK
+  tenant  Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
