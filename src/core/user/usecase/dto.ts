@@ -1,11 +1,12 @@
 import * as z from 'zod';
 import { zodParser } from '~/core/+shared/helpers/zod';
-import { zUserId, zUserName } from '../value-object';
+import { zUserEmail, zUserId, zUserName } from '../value-object';
 
 const zUserActiveDto = z.object({
   status: z.literal('active'),
   id: zUserId,
   name: zUserName,
+  email: zUserEmail,
 });
 export type UserActiveDto = z.infer<typeof zUserActiveDto>;
 

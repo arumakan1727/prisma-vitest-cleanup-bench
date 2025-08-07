@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { zodParser } from '~/core/+shared/helpers/zod';
 import { zUserDto } from '~/core/user/usecase/dto';
 import {
   zArticleCommentContent,
@@ -16,6 +17,9 @@ export const zArticleCommentDto = z
   })
   .brand<'ArticleCommentDto'>();
 export type ArticleCommentDto = z.infer<typeof zArticleCommentDto>;
+export const ArticleCommentDto = {
+  parse: zodParser(zArticleCommentDto),
+};
 
 export const zArticleDto = z
   .object({
@@ -29,3 +33,6 @@ export const zArticleDto = z
   })
   .brand<'ArticleDto'>();
 export type ArticleDto = z.infer<typeof zArticleDto>;
+export const ArticleDto = {
+  parse: zodParser(zArticleDto),
+};
