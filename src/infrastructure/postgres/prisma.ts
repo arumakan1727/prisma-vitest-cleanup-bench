@@ -84,7 +84,7 @@ export class PrismaTxExecutor
 {
   doReadOnlyTx<TResult>(
     tenantId: TenantId,
-    fn: (txHandle: PrismaReadOnlyTxHandle) => Promise<TResult>,
+    fn: (tx: PrismaReadOnlyTxHandle) => Promise<TResult>,
     options?: TransactionOptions
   ): Promise<TResult> {
     const prisma = getPrismaClient();
@@ -96,7 +96,7 @@ export class PrismaTxExecutor
 
   doReadWriteTx<TResult>(
     tenantId: TenantId,
-    fn: (txHandle: PrismaReadWriteTxHandle) => Promise<TResult>,
+    fn: (tx: PrismaReadWriteTxHandle) => Promise<TResult>,
     options?: TransactionOptions
   ): Promise<TResult> {
     const prisma = getPrismaClient();
