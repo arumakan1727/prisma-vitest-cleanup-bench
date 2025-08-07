@@ -37,10 +37,12 @@ export class PrismaReadWriteTxHandle extends PrismaReadOnlyTxHandle implements I
   readonly __type = 'ReadWrite'; // Opaque Type to distinguish from IReadOnlyTxHandle
 }
 
-export class PrismaTxExecutor implements ITxExecutor {
+export class PrismaTxExecutor
+  implements ITxExecutor<PrismaReadOnlyTxHandle, PrismaReadWriteTxHandle>
+{
   doReadOnlyTx<TResult>(
     tenantId: TenantId,
-    fn: (txHandle: IReadOnlyTxHandle) => Promise<TResult>,
+    fn: (txHandle: PrismaReadOnlyTxHandle) => Promise<TResult>,
     options?: TransactionOptions
   ): Promise<TResult> {
     const prisma = getPrismaClient();
@@ -52,7 +54,7 @@ export class PrismaTxExecutor implements ITxExecutor {
 
   doReadWriteTx<TResult>(
     tenantId: TenantId,
-    fn: (txHandle: IReadWriteTxHandle) => Promise<TResult>,
+    fn: (txHandle: PrismaReadWriteTxHandle) => Promise<TResult>,
     options?: TransactionOptions
   ): Promise<TResult> {
     const prisma = getPrismaClient();

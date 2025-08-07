@@ -33,14 +33,17 @@ export type TransactionOptions = {
  * トランザクションを実行するインターフェース。
  * 実装はインフラストラクチャ層で定義する。
  */
-export interface ITxExecutor {
+export interface ITxExecutor<
+  ReadOnlyTx extends IReadOnlyTxHandle = IReadOnlyTxHandle,
+  ReadWriteTx extends IReadWriteTxHandle = IReadWriteTxHandle,
+> {
   /**
    * 読み取り専用トランザクションを実行する。
    * Aurora の Reader Endpoint に投げる想定。
    */
   doReadOnlyTx<TResult>(
     tenantId: TenantId,
-    fn: (txHandle: IReadOnlyTxHandle) => Promise<TResult>,
+    fn: (txHandle: ReadOnlyTx) => Promise<TResult>,
     options?: TransactionOptions
   ): Promise<TResult>;
 
@@ -50,7 +53,7 @@ export interface ITxExecutor {
    */
   doReadWriteTx<TResult>(
     tenantId: TenantId,
-    fn: (txHandle: IReadWriteTxHandle) => Promise<TResult>,
+    fn: (txHandle: ReadWriteTx) => Promise<TResult>,
     options?: TransactionOptions
   ): Promise<TResult>;
 }
