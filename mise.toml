@@ -2,6 +2,7 @@
 node = '24.4'
 pnpm = '10'  # 実際に使うバージョンは package.json の packageManager で指定。 pnpm v10 から manage-package-manager-versions=true がデフォルトで有効。
 
+uv = "latest"  # poetry などの CLI を入れるため
 'aqua:BurntSushi/ripgrep' = 'latest'
 task = 'latest' # タスクランナー
 'npm:@anthropic-ai/claude-code' = "latest"

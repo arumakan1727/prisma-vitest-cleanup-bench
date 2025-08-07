@@ -5,3 +5,5 @@ tmp
 /memo
 
 *.local
+.mcp.json
+.serena/cache
