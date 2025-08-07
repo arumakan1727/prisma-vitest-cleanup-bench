@@ -1,0 +1,27 @@
+version: '3'
+
+tasks:
+  up:
+    desc: Start development infrastructure with {{.DOCKER}}
+    cmds:
+      - "{{.DOCKER}} compose up -d"
+
+  down:
+    desc: Stop development infrastructure with {{.DOCKER}}
+    cmds:
+      - "{{.DOCKER}} compose down"
+
+  remove:
+    desc: Remove development infrastructure with {{.DOCKER}}
+    cmds:
+      - "{{.DOCKER}} compose down --volumes --remove-orphans"
+
+  ps:
+    desc: List containers in development infrastructure with {{.DOCKER}}
+    cmds:
+      - "{{.DOCKER}} compose ps"
+
+  logs:
+    desc: Show logs in development infrastructure with {{.DOCKER}}
+    cmds:
+      - "{{.DOCKER}} compose logs"

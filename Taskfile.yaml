@@ -1,0 +1,11 @@
+version: '3'
+
+includes:
+  podman:
+    taskfile: Taskfile.container.yaml
+    vars:
+      DOCKER: podman
+  docker:
+    taskfile: Taskfile.container.yaml
+    vars:
+      DOCKER: docker

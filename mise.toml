@@ -11,3 +11,18 @@ pipx.uvx = true # tools の 'pip:*' を pipx ではなく uvx でインストー
 [settings.status]
 missing_tools = 'always'
 show_env = true
+
+[env]
+# PG*** は ./app/.server/prisma/ や psql コマンドが読む。
+# app ユーザは initdb.d で作成する。 bypassRLS 属性なし。
+PGUSER = 'app'
+PGPASSWORD = 'password'
+PGHOST = 'localhost'
+PGPORT = '5432'
+PGDATABASE = 'main'  # テスト時は test データベースを使う
+
+ADMIN_DATABASE_URL        = 'postgresql://admin:{{env.PGPASSWORD}}@localhost:{{env.PGPORT}}/{{env.PGDATABASE}}'
+ADMIN_TEST_DATABASE_URL   = 'postgresql://admin:{{env.PGPASSWORD}}@localhost:{{env.PGPORT}}/test'
+APP_DATABASE_URL          = 'postgresql://{{env.PGUSER}}:{{env.PGPASSWORD}}@localhost:{{env.PGPORT}}/{{env.PGDATABASE}}'
+APP_TEST_DATABASE_URL     = 'postgresql://{{env.PGUSER}}:{{env.PGPASSWORD}}@localhost:{{env.PGPORT}}/test'
+ADMIN_SHADOW_DATABASE_URL = 'postgresql://admin:{{env.PGPASSWORD}}@localhost:{{env.PGPORT}}/dev_db_shadow?connection_limit=1'

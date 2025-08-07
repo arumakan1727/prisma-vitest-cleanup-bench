@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17
+    ports:
+      - ${PGPORT:-5432}:5432
+    environment:
+      - POSTGRES_USER=admin  # superuser権限, bypassRLS持ち。このユーザとは別に bypassRLS ナシの 'app' ユーザを initdb.d で作成する。
+      - POSTGRES_PASSWORD=${PGPASSWORD:?Set PGPASSWORD environment variable}
+      - POSTGRES_DB=${PGDATABASE:?Set PGDATABASE environment variable}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/initdb.d/:/docker-entrypoint-initdb.d/:ro
+
+volumes:
+  postgres-data: {}

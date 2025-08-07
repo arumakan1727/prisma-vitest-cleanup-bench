@@ -1,0 +1,21 @@
+CREATE DATABASE dev_db_shadow;
+
+\c dev_db_shadow
+
+CREATE EXTENSION IF NOT EXISTS citext SCHEMA "public";
+
+-- add app user
+DO $$
+BEGIN
+   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'app') THEN
+      CREATE USER app WITH PASSWORD 'password';
+   END IF;
+END $$;
+
+-- grant app user to access schema
+GRANT ALL PRIVILEGES ON SCHEMA "public" TO "app";
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA "public" TO "app";
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "public" TO "app";
+ALTER DEFAULT PRIVILEGES IN SCHEMA "public" GRANT ALL PRIVILEGES ON TABLES TO "app";
+ALTER DEFAULT PRIVILEGES IN SCHEMA "public" GRANT ALL PRIVILEGES ON SEQUENCES TO "app";
