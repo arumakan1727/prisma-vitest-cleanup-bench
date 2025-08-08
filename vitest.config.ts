@@ -18,11 +18,11 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'A',
-          include: ['src/infrastructure/postgres/__test__/A_each-commit-trancate/**/*.test.ts'],
+          include: ['src/infrastructure/postgres/__test__/A_each-commit-truncate/**/*.test.ts'],
           setupFiles:
-            './src/infrastructure/postgres/__test__/A_each-commit-trancate/+each-file-setup.ts',
+            './src/infrastructure/postgres/__test__/A_each-commit-truncate/+each-file-setup.ts',
           globalSetup:
-            './src/infrastructure/postgres/__test__/A_each-commit-trancate/+global-setup.ts',
+            './src/infrastructure/postgres/__test__/A_each-commit-truncate/+global-setup.ts',
         },
       },
     ],
