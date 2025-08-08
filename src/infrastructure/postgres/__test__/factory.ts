@@ -25,30 +25,60 @@ export const TenantFactory = defineTenantFactory({
   }),
 });
 
-export const UserFactory = defineUserFactory({
-  defaultData: async ({ seq }) => ({
-    tenant: TenantFactory,
-    name: `User ${seq}`,
+type IdOnlyTenant = { id: string };
+
+export const UserFactory = {
+  ...defineUserFactory({
+    defaultData: async ({ seq }) => ({
+      tenant: TenantFactory,
+      name: `User ${seq}`,
+    }),
+    traits: {
+      ACTIVE: {
+        onAfterCreate: async (user) => {
+          await UserActiveFactory.create({
+            tenant: { connect: { id: user.tenantId } },
+            user: { connect: user },
+          });
+        },
+      },
+      DELETED: {
+        onAfterCreate: async (user) => {
+          await UserDeletedFactory.create({
+            tenant: { connect: { id: user.tenantId } },
+            user: { connect: user },
+          });
+        },
+      },
+    },
   }),
-  traits: {
-    ACTIVE: {
-      onAfterCreate: async (user) => {
-        await UserActiveFactory.create({
-          tenant: { connect: { id: user.tenantId } },
-          user: { connect: user },
-        });
-      },
-    },
-    DELETED: {
-      onAfterCreate: async (user) => {
-        await UserDeletedFactory.create({
-          tenant: { connect: { id: user.tenantId } },
-          user: { connect: user },
-        });
-      },
-    },
+  createActive: async ({ tenant }: { tenant: IdOnlyTenant }) => {
+    const user = await UserFactory.create({
+      tenant: { connect: tenant },
+    });
+    const active = await UserActiveFactory.create({
+      tenant: { connect: tenant },
+      user: { connect: user },
+    });
+    return {
+      ...user,
+      active,
+    };
   },
-});
+  createDeleted: async ({ tenant }: { tenant: IdOnlyTenant }) => {
+    const user = await UserFactory.create({
+      tenant: { connect: tenant },
+    });
+    const deleted = await UserDeletedFactory.create({
+      tenant: { connect: tenant },
+      user: { connect: user },
+    });
+    return {
+      ...user,
+      deleted,
+    };
+  },
+};
 
 // 子テーブルは export しない (UserFactory の traits で user と一緒に create する)
 const UserActiveFactory = defineUserActiveFactory({

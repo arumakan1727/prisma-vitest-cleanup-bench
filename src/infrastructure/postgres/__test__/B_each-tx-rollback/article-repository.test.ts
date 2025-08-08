@@ -15,10 +15,7 @@ describe('ArticleRepository', () => {
     repeatTest('存在する記事を正常に取得できる', async () => {
       await txExecutor.doTestTx(async ({ tx, tenant }) => {
         // Arrange
-        const author = await UserFactory.use('ACTIVE').create({
-          tenant: { connect: tenant },
-        });
-
+        const author = await UserFactory.createActive({ tenant });
         const article = await ArticleFactory.create({
           tenant: { connect: tenant },
           author: { connect: author },
@@ -28,10 +25,7 @@ describe('ArticleRepository', () => {
         const articleId = ArticleId.parse(article.id);
 
         // コメントも作成
-        const commentAuthor = await UserFactory.use('ACTIVE').create({
-          tenant: { connect: tenant },
-        });
-
+        const commentAuthor = await UserFactory.createActive({ tenant });
         const comment = await CommentFactory.create({
           tenant: { connect: tenant },
           article: { connect: article },
@@ -47,13 +41,13 @@ describe('ArticleRepository', () => {
           id: article.id,
           title: 'テスト記事',
           content: 'テスト記事の内容',
-          createdAt: expect.any(Date),
-          updatedAt: expect.any(Date),
+          createdAt: article.createdAt,
+          updatedAt: article.updatedAt,
           author: {
             id: author.id,
             status: 'ACTIVE',
             name: author.name,
-            email: expect.any(String),
+            email: author.active.email,
           },
           comments: [
             {
@@ -63,7 +57,7 @@ describe('ArticleRepository', () => {
                 id: commentAuthor.id,
                 status: 'ACTIVE',
                 name: commentAuthor.name,
-                email: expect.any(String),
+                email: commentAuthor.active.email,
               },
             },
           ],
