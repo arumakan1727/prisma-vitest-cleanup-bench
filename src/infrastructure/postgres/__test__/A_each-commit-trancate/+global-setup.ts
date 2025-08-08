@@ -1,7 +1,7 @@
 import { execSync } from 'node:child_process';
-import { disconnectPrisma } from '../prisma';
-import { bypassRlsPrisma } from './bypass-rls-prisma';
-import { testEnv } from './test-env';
+import { disconnectPrisma } from '../../prisma';
+import { bypassRlsPrisma } from '../bypass-rls-prisma';
+import { testEnv } from '../test-env';
 
 export default () => {
   console.log('--- global setup ---');
