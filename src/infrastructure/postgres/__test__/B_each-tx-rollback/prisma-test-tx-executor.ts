@@ -7,44 +7,49 @@ import { setFactoryPrismaClient, TenantFactory } from '../factory';
 
 type PrismaTx = Omit<PrismaClient, ITXClientDenyList>;
 
+const ROLLBACK_SYMBOL = Symbol('rollback');
+
 export class PrismaTestTxExecutor {
   private tenant: Tenant | null = null;
   private otherTenant: Tenant | null = null;
   private readonly txExecutor = new PrismaTxExecutor();
 
-  async doTestTx<TResult>(
+  async doTestTx(
     fn: (params: {
       tx: PrismaReadWriteTxHandle;
       tenant: Tenant;
       withOtherTenantRls: <T>(fn: (otherTenant: Tenant) => Promise<T>) => Promise<T>;
-    }) => Promise<TResult>
-  ): Promise<TResult> {
+    }) => Promise<void>
+  ): Promise<void> {
     const { tenant, otherTenant } = await this.ensureTenantAndOtherTenant();
-    console.log('doTestTx::tenant', tenant);
-    console.log('doTestTx::otherTenant', otherTenant);
     const tenantId = TenantId.parse(tenant.id);
 
-    return await this.txExecutor.doReadWriteTx(tenantId, async (tx) => {
-      setFactoryPrismaClient(tx.prisma as PrismaClient);
+    try {
+      await this.txExecutor.doReadWriteTx(tenantId, async (tx) => {
+        setFactoryPrismaClient(tx.prisma as PrismaClient);
 
-      const withOtherTenantRls = async <T>(
-        otherTenantFn: (otherTenant: Tenant) => Promise<T>
-      ): Promise<T> => {
-        await setTenantIdLocally(tx.prisma, otherTenant.id);
-        try {
-          return await otherTenantFn(otherTenant);
-        } finally {
-          await setTenantIdLocally(tx.prisma, tenant.id);
-        }
-      };
+        const withOtherTenantRls = async <T>(
+          otherTenantFn: (otherTenant: Tenant) => Promise<T>
+        ): Promise<T> => {
+          await setTenantIdLocally(tx.prisma, otherTenant.id);
+          try {
+            return await otherTenantFn(otherTenant);
+          } finally {
+            await setTenantIdLocally(tx.prisma, tenant.id);
+          }
+        };
 
-      const result = await fn({ tx, tenant, withOtherTenantRls });
+        await fn({ tx, tenant, withOtherTenantRls });
 
-      // テスト後にロールバック
-      await tx.prisma.$executeRaw`ROLLBACK`;
-
-      return result;
-    });
+        // テスト後にロールバック
+        // queryRaw`ROLLBACK` でもロールバックはできるが、その後に COMMIT が実行されてしまう (エラーにはならないが...)
+        throw ROLLBACK_SYMBOL;
+      });
+    } catch (e) {
+      if (e !== ROLLBACK_SYMBOL) {
+        throw e;
+      }
+    }
   }
 
   private async ensureTenantAndOtherTenant() {
@@ -52,9 +57,11 @@ export class PrismaTestTxExecutor {
 
     if (!this.tenant) {
       this.tenant = await TenantFactory.create({ name: 'Main Tenant' });
+      console.log('PrismaTestTxExecutor::tenant', this.tenant);
     }
     if (!this.otherTenant) {
       this.otherTenant = await TenantFactory.create({ name: 'Other Tenant' });
+      console.log('PrismaTestTxExecutor::otherTenant', this.otherTenant);
     }
     return { tenant: this.tenant, otherTenant: this.otherTenant };
   }
