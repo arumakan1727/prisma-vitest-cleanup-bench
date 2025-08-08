@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { afterEach, assert, describe, expect } from 'vitest';
 import { ArticleContent, ArticleId, ArticleTitle } from '~/core/article/value-object';
 import { TenantId } from '~/core/tenant/value-object';
@@ -127,6 +128,49 @@ describe('ArticleRepository', () => {
   });
 
   describe('create', () => {
+    repeatTest('RLSのtenantIdとは別のtenantIdでUserを作成してみる (エラーになるはず)', async () => {
+      // Arrange
+      const tenant = await TenantFactory.create({ name: 'Tenant 1' });
+      const otherTenant = await TenantFactory.create({ name: 'Tenant 2' });
+      const tenantId = TenantId.parse(tenant.id);
+      const otherTenantId = TenantId.parse(otherTenant.id);
+
+      // Act
+      let error: unknown;
+      try {
+        await txExecutor.doReadWriteTx(tenantId, async (tx) => {
+          await tx.prisma.user.create({
+            data: {
+              tenantId: otherTenantId,
+              name: 'Other Tenant User',
+            },
+          });
+        });
+        // エラーが発生しなかった場合はテスト失敗
+        throw new Error('Expected error to be thrown');
+      } catch (e) {
+        error = e;
+      }
+
+      // Assert
+      assert.instanceOf(error, Prisma.PrismaClientUnknownRequestError);
+      assert.strictEqual(error.constructor.name, 'PrismaClientUnknownRequestError');
+      console.log('-------------------------');
+      console.log(typeof error);
+      console.log(error);
+      console.log(error.message);
+      console.log(' - - - - - - ');
+      console.log(error.cause);
+      console.log('-------------------------');
+
+      // PrismaClientUnknownRequestError ではエラーの情報が message という文字列になってしまっており、構造化して取り出す術はない (悲しいね)
+      assert.match(
+        error.message,
+        /new row violates row-level security policy for table \\"users\\"/
+      );
+      assert.match(error.message, /code: "42501"/);
+      assert.match(error.message, /severity: "ERROR"/);
+    });
     repeatTest('新しい記事を正常に作成できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
