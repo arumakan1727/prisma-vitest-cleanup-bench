@@ -9,7 +9,8 @@
     "fix": "biome check --write",
     "fix:unsafe": "biome check --write --unsafe",
     "typechk": "tsc --noEmit",
-    "test:A": "vitest run --project A"
+    "test:A": "vitest run --project A",
+    "test:B": "vitest run --project B"
   },
   "keywords": [],
   "author": "",

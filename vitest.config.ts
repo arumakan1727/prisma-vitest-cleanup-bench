@@ -25,6 +25,16 @@ export default defineConfig({
             './src/infrastructure/postgres/__test__/A_each-commit-truncate/+global-setup.ts',
         },
       },
+      {
+        extends: true,
+        test: {
+          name: 'B',
+          include: ['src/infrastructure/postgres/__test__/B_each-tx-rollback/**/*.test.ts'],
+          setupFiles:
+            './src/infrastructure/postgres/__test__/B_each-tx-rollback/+each-file-setup.ts',
+          globalSetup: './src/infrastructure/postgres/__test__/B_each-tx-rollback/+global-setup.ts',
+        },
+      },
     ],
   },
 });
