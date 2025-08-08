@@ -1,3 +1,4 @@
+import type { PrismaClient } from '@prisma/client';
 import { bypassRlsPrisma } from './bypass-rls-prisma';
 import {
   defineArticleFactory,
@@ -9,13 +10,14 @@ import {
   initialize,
 } from './fabbrica.gen';
 
-initialize({
-  prisma: () => {
-    // テスト用のPrismaクライアントを返す
-    // 注意: ファクトリーはbypassRlsPrismaを使用するが、実際のテストではPrismaTxExecutorを使用する
-    return bypassRlsPrisma;
-  },
-});
+export const setFactoryPrismaClient = (prisma: PrismaClient) => {
+  initialize({
+    prisma: () => prisma,
+  });
+};
+
+// デフォルトはbypassRlsPrisma
+setFactoryPrismaClient(bypassRlsPrisma);
 
 export const TenantFactory = defineTenantFactory({
   defaultData: async ({ seq }) => ({
