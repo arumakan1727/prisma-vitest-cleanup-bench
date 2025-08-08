@@ -5,7 +5,7 @@ import { TenantId } from '~/core/tenant/value-object';
 import { UserId } from '~/core/user/value-object';
 import { PrismaTxExecutor } from '../../prisma';
 import { ArticleRepository } from '../../repository/article';
-import { truncate } from '../+global-setup';
+import { truncate } from '../bypass-rls-prisma';
 import { ArticleFactory, CommentFactory, TenantFactory, UserFactory } from '../factory';
 import { repeatTest } from '../helpers';
 

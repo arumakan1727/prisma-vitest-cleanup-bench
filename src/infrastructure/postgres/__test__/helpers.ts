@@ -1,5 +1,5 @@
 import { it } from 'vitest';
-import { truncate } from './+global-setup';
+import { truncate } from './bypass-rls-prisma';
 import { testEnv } from './test-env';
 
 /**

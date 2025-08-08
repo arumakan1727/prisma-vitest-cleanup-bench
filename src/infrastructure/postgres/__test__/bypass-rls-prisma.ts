@@ -7,3 +7,8 @@ export const bypassRlsPrisma = new PrismaClient({
   // こっちで log を設定すると postgres/prisma.ts の log が上書きされてしまう (は？？？)
   // log: ['query', 'info', 'warn', 'error'],
 });
+export const truncate = async () => {
+  // TRUNCATE は DELETE と異なりスキャンしないので高速。
+  // CASCADE すると子孫テーブルも TRUNCATE される。
+  await bypassRlsPrisma.$executeRaw`TRUNCATE TABLE "tenants" RESTART IDENTITY CASCADE`;
+};
