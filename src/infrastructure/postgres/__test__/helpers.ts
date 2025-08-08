@@ -10,6 +10,14 @@ export const repeatTest = (name: string, fn: () => Promise<void>) => {
   it(name, async () => {
     for (let i = 0; i < testEnv.TEST_REPEAT_COUNT; i++) {
       await fn();
+    }
+  });
+};
+
+export const repeatTestWithTruncate = (name: string, fn: () => Promise<void>) => {
+  it(name, async () => {
+    for (let i = 0; i < testEnv.TEST_REPEAT_COUNT; i++) {
+      await fn();
       if (i < testEnv.TEST_REPEAT_COUNT - 1) {
         await truncate();
       }

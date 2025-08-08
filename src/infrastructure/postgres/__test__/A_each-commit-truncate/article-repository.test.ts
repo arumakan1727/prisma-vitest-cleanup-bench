@@ -7,7 +7,7 @@ import { PrismaTxExecutor } from '../../prisma';
 import { ArticleRepository } from '../../repository/article';
 import { truncate } from '../bypass-rls-prisma';
 import { ArticleFactory, CommentFactory, TenantFactory, UserFactory } from '../factory';
-import { repeatTest } from '../helpers';
+import { repeatTestWithTruncate } from '../helpers';
 
 describe('ArticleRepository', () => {
   const repository = new ArticleRepository();
@@ -18,7 +18,7 @@ describe('ArticleRepository', () => {
   });
 
   describe('findById', () => {
-    repeatTest('存在する記事を正常に取得できる', async () => {
+    repeatTestWithTruncate('存在する記事を正常に取得できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -72,7 +72,7 @@ describe('ArticleRepository', () => {
       expect(firstComment.author.name).toBe(commentAuthor.name);
     });
 
-    repeatTest('存在しない記事IDの場合はnullを返す', async () => {
+    repeatTestWithTruncate('存在しない記事IDの場合はnullを返す', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -87,7 +87,7 @@ describe('ArticleRepository', () => {
       expect(result).toBeNull();
     });
 
-    repeatTest('異なるTenantの記事は取得できない', async () => {
+    repeatTestWithTruncate('異なるTenantの記事は取得できない', async () => {
       // Arrange
       const tenant1 = await TenantFactory.create({ name: 'Tenant 1' });
       const tenant2 = await TenantFactory.create({ name: 'Tenant 2' });
@@ -116,50 +116,53 @@ describe('ArticleRepository', () => {
   });
 
   describe('create', () => {
-    repeatTest('RLSのtenantIdとは別のtenantIdでUserを作成してみる (エラーになるはず)', async () => {
-      // Arrange
-      const tenant = await TenantFactory.create({ name: 'Tenant 1' });
-      const otherTenant = await TenantFactory.create({ name: 'Tenant 2' });
-      const tenantId = TenantId.parse(tenant.id);
-      const otherTenantId = TenantId.parse(otherTenant.id);
+    repeatTestWithTruncate(
+      'RLSのtenantIdとは別のtenantIdでUserを作成してみる (エラーになるはず)',
+      async () => {
+        // Arrange
+        const tenant = await TenantFactory.create({ name: 'Tenant 1' });
+        const otherTenant = await TenantFactory.create({ name: 'Tenant 2' });
+        const tenantId = TenantId.parse(tenant.id);
+        const otherTenantId = TenantId.parse(otherTenant.id);
 
-      // Act
-      let error: unknown;
-      try {
-        await txExecutor.doReadWriteTx(tenantId, async (tx) => {
-          await tx.prisma.user.create({
-            data: {
-              tenantId: otherTenantId,
-              name: 'Other Tenant User',
-            },
+        // Act
+        let error: unknown;
+        try {
+          await txExecutor.doReadWriteTx(tenantId, async (tx) => {
+            await tx.prisma.user.create({
+              data: {
+                tenantId: otherTenantId,
+                name: 'Other Tenant User',
+              },
+            });
           });
-        });
-        // エラーが発生しなかった場合はテスト失敗
-        throw new Error('Expected error to be thrown');
-      } catch (e) {
-        error = e;
+          // エラーが発生しなかった場合はテスト失敗
+          throw new Error('Expected error to be thrown');
+        } catch (e) {
+          error = e;
+        }
+
+        // Assert
+        assert.instanceOf(error, Prisma.PrismaClientUnknownRequestError);
+        assert.strictEqual(error.constructor.name, 'PrismaClientUnknownRequestError');
+        console.log('-------------------------');
+        console.log(typeof error);
+        console.log(error);
+        console.log(error.message);
+        console.log(' - - - - - - ');
+        console.log(error.cause);
+        console.log('-------------------------');
+
+        // PrismaClientUnknownRequestError ではエラーの情報が message という文字列になってしまっており、構造化して取り出す術はない (悲しいね)
+        assert.match(
+          error.message,
+          /new row violates row-level security policy for table \\"users\\"/
+        );
+        assert.match(error.message, /code: "42501"/);
+        assert.match(error.message, /severity: "ERROR"/);
       }
-
-      // Assert
-      assert.instanceOf(error, Prisma.PrismaClientUnknownRequestError);
-      assert.strictEqual(error.constructor.name, 'PrismaClientUnknownRequestError');
-      console.log('-------------------------');
-      console.log(typeof error);
-      console.log(error);
-      console.log(error.message);
-      console.log(' - - - - - - ');
-      console.log(error.cause);
-      console.log('-------------------------');
-
-      // PrismaClientUnknownRequestError ではエラーの情報が message という文字列になってしまっており、構造化して取り出す術はない (悲しいね)
-      assert.match(
-        error.message,
-        /new row violates row-level security policy for table \\"users\\"/
-      );
-      assert.match(error.message, /code: "42501"/);
-      assert.match(error.message, /severity: "ERROR"/);
-    });
-    repeatTest('新しい記事を正常に作成できる', async () => {
+    );
+    repeatTestWithTruncate('新しい記事を正常に作成できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -197,7 +200,7 @@ describe('ArticleRepository', () => {
       }
     });
 
-    repeatTest('タイトルが最大長の記事を作成できる', async () => {
+    repeatTestWithTruncate('タイトルが最大長の記事を作成できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -227,7 +230,7 @@ describe('ArticleRepository', () => {
       expect(created.title.length).toBe(80);
     });
 
-    repeatTest('コンテンツが最大長の記事を作成できる', async () => {
+    repeatTestWithTruncate('コンテンツが最大長の記事を作成できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -259,7 +262,7 @@ describe('ArticleRepository', () => {
   });
 
   describe('findMany', () => {
-    repeatTest('テナントの全記事を取得できる', async () => {
+    repeatTestWithTruncate('テナントの全記事を取得できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -324,7 +327,7 @@ describe('ArticleRepository', () => {
       expect(articleWithComments.comments).toHaveLength(2);
     });
 
-    repeatTest('記事がない場合は空配列を返す', async () => {
+    repeatTestWithTruncate('記事がない場合は空配列を返す', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -338,7 +341,7 @@ describe('ArticleRepository', () => {
       expect(articles).toEqual([]);
     });
 
-    repeatTest('異なるテナントの記事は取得しない', async () => {
+    repeatTestWithTruncate('異なるテナントの記事は取得しない', async () => {
       // Arrange
       const tenant1 = await TenantFactory.create({ name: 'Tenant 1' });
       const tenant2 = await TenantFactory.create({ name: 'Tenant 2' });
@@ -384,7 +387,7 @@ describe('ArticleRepository', () => {
       expect(tenant2Articles[0]?.title).toBe('Tenant2の記事');
     });
 
-    repeatTest('削除済みユーザーの記事も取得できる', async () => {
+    repeatTestWithTruncate('削除済みユーザーの記事も取得できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -423,7 +426,7 @@ describe('ArticleRepository', () => {
   });
 
   describe('delete', () => {
-    repeatTest('記事を正常に削除できる', async () => {
+    repeatTestWithTruncate('記事を正常に削除できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -448,7 +451,7 @@ describe('ArticleRepository', () => {
       expect(deleted).toBeNull();
     });
 
-    repeatTest('コメント付きの記事も削除できる', async () => {
+    repeatTestWithTruncate('コメント付きの記事も削除できる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -487,7 +490,7 @@ describe('ArticleRepository', () => {
       expect(deleted).toBeNull();
     });
 
-    repeatTest('存在しない記事の削除はエラーになる', async () => {
+    repeatTestWithTruncate('存在しない記事の削除はエラーになる', async () => {
       // Arrange
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
@@ -499,7 +502,7 @@ describe('ArticleRepository', () => {
       ).rejects.toThrow();
     });
 
-    repeatTest('異なるテナントの記事は削除できない', async () => {
+    repeatTestWithTruncate('異なるテナントの記事は削除できない', async () => {
       // Arrange
       const tenant1 = await TenantFactory.create({ name: 'Tenant 1' });
       const tenant2 = await TenantFactory.create({ name: 'Tenant 2' });
