@@ -23,11 +23,7 @@ describe('ArticleRepository', () => {
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
 
-      const author = await UserFactory.use('ACTIVE').create({
-        tenant: {
-          connect: tenant,
-        },
-      });
+      const author = await UserFactory.createActive({ tenant });
 
       const article = await ArticleFactory.create({
         tenant: {
@@ -42,11 +38,7 @@ describe('ArticleRepository', () => {
       const articleId = ArticleId.parse(article.id);
 
       // コメントも作成
-      const commentAuthor = await UserFactory.use('ACTIVE').create({
-        tenant: {
-          connect: tenant,
-        },
-      });
+      const commentAuthor = await UserFactory.createActive({ tenant });
 
       await CommentFactory.create({
         tenant: {
@@ -101,11 +93,7 @@ describe('ArticleRepository', () => {
       const tenant2 = await TenantFactory.create({ name: 'Tenant 2' });
       const tenant2Id = TenantId.parse(tenant2.id);
 
-      const author = await UserFactory.use('ACTIVE').create({
-        tenant: {
-          connect: tenant1,
-        },
-      });
+      const author = await UserFactory.createActive({ tenant: tenant1 });
       const article = await ArticleFactory.create({
         tenant: {
           connect: tenant1,
@@ -176,11 +164,7 @@ describe('ArticleRepository', () => {
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
 
-      const author = await UserFactory.use('ACTIVE').create({
-        tenant: {
-          connect: tenant,
-        },
-      });
+      const author = await UserFactory.createActive({ tenant });
       const authorId = UserId.parse(author.id);
 
       const articleCreate = {
@@ -218,11 +202,7 @@ describe('ArticleRepository', () => {
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
 
-      const author = await UserFactory.use('ACTIVE').create({
-        tenant: {
-          connect: tenant,
-        },
-      });
+      const author = await UserFactory.createActive({ tenant });
       const authorId = UserId.parse(author.id);
 
       const maxLengthTitle = 'あ'.repeat(80); // ArticleTitleの最大長は80文字
@@ -252,11 +232,7 @@ describe('ArticleRepository', () => {
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
 
-      const author = await UserFactory.use('ACTIVE').create({
-        tenant: {
-          connect: tenant,
-        },
-      });
+      const author = await UserFactory.createActive({ tenant });
       const authorId = UserId.parse(author.id);
 
       const maxLengthContent = 'あ'.repeat(1000); // ArticleContentの最大長は1000文字
@@ -288,12 +264,8 @@ describe('ArticleRepository', () => {
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
 
-      const author1 = await UserFactory.use('ACTIVE').create({
-        tenant: { connect: tenant },
-      });
-      const author2 = await UserFactory.use('ACTIVE').create({
-        tenant: { connect: tenant },
-      });
+      const author1 = await UserFactory.createActive({ tenant });
+      const author2 = await UserFactory.createActive({ tenant });
 
       // 記事を3つ作成
       const article1 = await ArticleFactory.create({
@@ -373,12 +345,8 @@ describe('ArticleRepository', () => {
       const tenant1Id = TenantId.parse(tenant1.id);
       const tenant2Id = TenantId.parse(tenant2.id);
 
-      const author1 = await UserFactory.use('ACTIVE').create({
-        tenant: { connect: tenant1 },
-      });
-      const author2 = await UserFactory.use('ACTIVE').create({
-        tenant: { connect: tenant2 },
-      });
+      const author1 = await UserFactory.createActive({ tenant: tenant1 });
+      const author2 = await UserFactory.createActive({ tenant: tenant2 });
 
       // tenant1に2つ、tenant2に1つの記事を作成
       await ArticleFactory.create({
@@ -421,12 +389,8 @@ describe('ArticleRepository', () => {
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
 
-      const activeAuthor = await UserFactory.use('ACTIVE').create({
-        tenant: { connect: tenant },
-      });
-      const deletedAuthor = await UserFactory.use('DELETED').create({
-        tenant: { connect: tenant },
-      });
+      const activeAuthor = await UserFactory.createActive({ tenant });
+      const deletedAuthor = await UserFactory.createDeleted({ tenant });
 
       await ArticleFactory.create({
         tenant: { connect: tenant },
@@ -464,9 +428,7 @@ describe('ArticleRepository', () => {
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
 
-      const author = await UserFactory.use('ACTIVE').create({
-        tenant: { connect: tenant },
-      });
+      const author = await UserFactory.createActive({ tenant });
 
       const article = await ArticleFactory.create({
         tenant: { connect: tenant },
@@ -491,9 +453,7 @@ describe('ArticleRepository', () => {
       const tenant = await TenantFactory.create();
       const tenantId = TenantId.parse(tenant.id);
 
-      const author = await UserFactory.use('ACTIVE').create({
-        tenant: { connect: tenant },
-      });
+      const author = await UserFactory.createActive({ tenant });
 
       const article = await ArticleFactory.create({
         tenant: { connect: tenant },
@@ -545,9 +505,7 @@ describe('ArticleRepository', () => {
       const tenant2 = await TenantFactory.create({ name: 'Tenant 2' });
       const tenant2Id = TenantId.parse(tenant2.id);
 
-      const author = await UserFactory.use('ACTIVE').create({
-        tenant: { connect: tenant1 },
-      });
+      const author = await UserFactory.createActive({ tenant: tenant1 });
 
       const article = await ArticleFactory.create({
         tenant: { connect: tenant1 },

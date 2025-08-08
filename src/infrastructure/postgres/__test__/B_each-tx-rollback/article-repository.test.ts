@@ -82,11 +82,7 @@ describe('ArticleRepository', () => {
     repeatTest('異なるTenantの記事は取得できない', async () => {
       await txExecutor.doTestTx(async ({ tx, tenant, withOtherTenantRls }) => {
         // Arrange
-        const author = await UserFactory.use('ACTIVE').create({
-          tenant: {
-            connect: tenant,
-          },
-        });
+        const author = await UserFactory.createActive({ tenant });
         const article = await ArticleFactory.create({
           tenant: {
             connect: tenant,
@@ -100,11 +96,7 @@ describe('ArticleRepository', () => {
 
         // 他のテナントで記事を作成
         const { otherArticle } = await withOtherTenantRls(async (otherTenant) => {
-          const otherAuthor = await UserFactory.use('ACTIVE').create({
-            tenant: {
-              connect: otherTenant,
-            },
-          });
+          const otherAuthor = await UserFactory.createActive({ tenant: otherTenant });
           const otherArticle = await ArticleFactory.create({
             tenant: {
               connect: otherTenant,

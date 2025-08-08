@@ -33,24 +33,6 @@ export const UserFactory = {
       tenant: TenantFactory,
       name: `User ${seq}`,
     }),
-    traits: {
-      ACTIVE: {
-        onAfterCreate: async (user) => {
-          await UserActiveFactory.create({
-            tenant: { connect: { id: user.tenantId } },
-            user: { connect: user },
-          });
-        },
-      },
-      DELETED: {
-        onAfterCreate: async (user) => {
-          await UserDeletedFactory.create({
-            tenant: { connect: { id: user.tenantId } },
-            user: { connect: user },
-          });
-        },
-      },
-    },
   }),
   createActive: async ({ tenant }: { tenant: IdOnlyTenant }) => {
     const user = await UserFactory.create({
