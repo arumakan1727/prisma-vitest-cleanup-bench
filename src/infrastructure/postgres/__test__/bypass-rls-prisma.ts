@@ -11,7 +11,6 @@ export const bypassRlsPrisma = new PrismaClient({
 });
 
 export const truncate = async (opts?: { restartIdentity?: boolean }) => {
-  // TRUNCATE は DELETE と異なりスキャンしないので高速。
   // CASCADE すると子孫テーブルも TRUNCATE される。
   if (opts?.restartIdentity) {
     await bypassRlsPrisma.$executeRaw`TRUNCATE TABLE "tenants" RESTART IDENTITY CASCADE`;
