@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process';
 import { disconnectPrisma } from '../../prisma';
-import { bypassRlsPrisma } from '../bypass-rls-prisma';
+import { bypassRlsPrisma, truncate } from '../bypass-rls-prisma';
 import { testEnv } from '../test-env';
 
 export default () => {
@@ -10,8 +10,7 @@ export default () => {
   // teardown 関数は戻り値で返す
   return async () => {
     console.log('--- global teardown ---');
-    // トランザクションのロールバックが失敗した場合のために TRUNCATE を実行する
-    // await truncate();
+    await truncate({ restartIdentity: true });
     await disconnect();
   };
 };
