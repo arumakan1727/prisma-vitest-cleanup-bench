@@ -21,6 +21,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.1.3
         version: 2.1.3
+      '@electric-sql/pglite':
+        specifier: ^0.3.7
+        version: 0.3.7
       '@faker-js/faker':
         specifier: ^9.9.0
         version: 9.9.0
@@ -30,6 +33,9 @@ importers:
       '@types/node':
         specifier: ^24.2.0
         version: 24.2.0
+      pglite-prisma-adapter:
+        specifier: ^0.6.1
+        version: 0.6.1(@electric-sql/pglite@0.3.7)(@prisma/client@6.13.0(prisma@6.13.0(typescript@5.9.2))(typescript@5.9.2))
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -102,6 +108,9 @@ packages:
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
+
+  '@electric-sql/pglite@0.3.7':
+    resolution: {integrity: sha512-5c3mybVrhxu5s47zFZtIGdG8YHkKCBENOmqxnNBjY53ZoDhADY/c5UqBDl159b7qtkzNPtbbb893wL9zi1kAuw==}
 
   '@esbuild/aix-ppc64@0.25.8':
     resolution: {integrity: sha512-urAvrUedIqEiFR3FYSLTWQgLu5tb+m0qZw0NBEasUeo6wuqatkMDaRT+1uABiGXEu5vqgPd7FGE1BhsAIy9QVA==}
@@ -281,11 +290,17 @@ packages:
   '@prisma/config@6.13.0':
     resolution: {integrity: sha512-OYMM+pcrvj/NqNWCGESSxVG3O7kX6oWuGyvufTUNnDw740KIQvNyA4v0eILgkpuwsKIDU36beZCkUtIt0naTog==}
 
+  '@prisma/debug@6.10.1':
+    resolution: {integrity: sha512-k2YT53cWxv9OLjW4zSYTZ6Z7j0gPfCzcr2Mj99qsuvlxr8WAKSZ2NcSR0zLf/mP4oxnYG842IMj3utTgcd7CaA==}
+
   '@prisma/debug@6.13.0':
     resolution: {integrity: sha512-um+9pfKJW0ihmM83id9FXGi5qEbVJ0Vxi1Gm0xpYsjwUBnw6s2LdPBbrsG9QXRX46K4CLWCTNvskXBup4i9hlw==}
 
   '@prisma/dmmf@6.13.0':
     resolution: {integrity: sha512-69qWP2ddIpI2L3VyQkwGjhtyj1CNXUJ0qZPLa1VmZ27h20rUXBPflLAel9EtOyct/GSTjSq8qjBbhW5ohrfbSw==}
+
+  '@prisma/driver-adapter-utils@6.10.1':
+    resolution: {integrity: sha512-MJ7NiiMA5YQUD1aMHiOcLmRpW0U0NTpygyeuLMxHXnKbcq+HX/cy10qilFMLVzpveuIEHuwxziR67z6i0K1MKA==}
 
   '@prisma/driver-adapter-utils@6.13.0':
     resolution: {integrity: sha512-72gQS/rz0KRV1bvi37OGu5PgMAzTQplFZuTo1kSb4hK7sm0PTvl7+V4NFHdwXEUecTq/+FnF9Ts9Ac+iKPnEow==}
@@ -677,6 +692,12 @@ packages:
   perfect-debounce@1.0.0:
     resolution: {integrity: sha512-xCy9V055GLEqoFaHoC1SoLIaLmWctgCUaBaWxDZ7/Zx4CTyX7cJQLJOok/orfjZAh9kEYpjJa4d0KcJmCbctZA==}
 
+  pglite-prisma-adapter@0.6.1:
+    resolution: {integrity: sha512-Qb2rVecLSSngq+xPBLzMcqFkrCgCXNi2cuVAa009kOMiinqUmdGkEw6ZKpL0zeiEc9+YbLOy3PY8uKtMPA4P3Q==}
+    peerDependencies:
+      '@electric-sql/pglite': '>=0.2.0'
+      '@prisma/client': '>= 6.10.0'
+
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -690,6 +711,10 @@ packages:
   postcss@8.5.6:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
+
+  postgres-array@3.0.4:
+    resolution: {integrity: sha512-nAUSGfSDGOaOAEGwqsRY27GPOea7CNipJPOA7lPbdEpx5Kg3qzdP0AaWC5MlhTWV9s4hFX39nomVZ+C4tnGOJQ==}
+    engines: {node: '>=12'}
 
   prisma@6.13.0:
     resolution: {integrity: sha512-dfzORf0AbcEyyzxuv2lEwG8g+WRGF/qDQTpHf/6JoHsyF5MyzCEZwClVaEmw3WXcobgadosOboKUgQU0kFs9kw==}
@@ -969,6 +994,8 @@ snapshots:
   '@biomejs/cli-win32-x64@2.1.3':
     optional: true
 
+  '@electric-sql/pglite@0.3.7': {}
+
   '@esbuild/aix-ppc64@0.25.8':
     optional: true
 
@@ -1065,9 +1092,15 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
+  '@prisma/debug@6.10.1': {}
+
   '@prisma/debug@6.13.0': {}
 
   '@prisma/dmmf@6.13.0': {}
+
+  '@prisma/driver-adapter-utils@6.10.1':
+    dependencies:
+      '@prisma/debug': 6.10.1
 
   '@prisma/driver-adapter-utils@6.13.0':
     dependencies:
@@ -1456,6 +1489,13 @@ snapshots:
 
   perfect-debounce@1.0.0: {}
 
+  pglite-prisma-adapter@0.6.1(@electric-sql/pglite@0.3.7)(@prisma/client@6.13.0(prisma@6.13.0(typescript@5.9.2))(typescript@5.9.2)):
+    dependencies:
+      '@electric-sql/pglite': 0.3.7
+      '@prisma/client': 6.13.0(prisma@6.13.0(typescript@5.9.2))(typescript@5.9.2)
+      '@prisma/driver-adapter-utils': 6.10.1
+      postgres-array: 3.0.4
+
   picocolors@1.1.1: {}
 
   picomatch@4.0.3: {}
@@ -1471,6 +1511,8 @@ snapshots:
       nanoid: 3.3.11
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  postgres-array@3.0.4: {}
 
   prisma@6.13.0(typescript@5.9.2):
     dependencies:
