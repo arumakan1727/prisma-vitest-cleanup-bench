@@ -1,7 +1,5 @@
-import { execSync } from 'node:child_process';
 import { disconnectPrisma } from '../../prisma';
-import { bypassRlsPrisma, truncate } from '../bypass-rls-prisma';
-import { testEnv } from '../test-env';
+import { bypassRlsPrisma, migrate, truncate } from '../bypass-rls-prisma';
 
 export default () => {
   console.log('--- global setup ---');
@@ -13,17 +11,6 @@ export default () => {
     await truncate({ restartIdentity: true });
     await disconnect();
   };
-};
-
-const migrate = () => {
-  execSync('pnpm prisma migrate deploy', {
-    stdio: 'inherit',
-    env: {
-      ...process.env,
-      // prisma/schema.prisma では ADMIN_DATABASE_URL を参照しているのでその値を上書き
-      ADMIN_DATABASE_URL: testEnv.ADMIN_TEST_DATABASE_URL,
-    },
-  });
 };
 
 const disconnect = async () => {
