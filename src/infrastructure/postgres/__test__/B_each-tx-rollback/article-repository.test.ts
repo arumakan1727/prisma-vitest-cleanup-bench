@@ -40,7 +40,7 @@ describe('ArticleRepository', () => {
         const result = await repository.findById(tx, articleId);
 
         // Assert
-        const expected = {
+        expect(result).toEqual({
           id: article.id,
           title: 'テスト記事',
           content: 'テスト記事の内容',
@@ -64,8 +64,7 @@ describe('ArticleRepository', () => {
               },
             },
           ],
-        } as const satisfies z.input<typeof ArticleDto>;
-        expect(result).toEqual(expected);
+        } as const satisfies z.input<typeof ArticleDto>);
       });
     });
 

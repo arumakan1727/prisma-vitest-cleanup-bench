@@ -1,5 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { afterEach, assert, describe, expect } from 'vitest';
+import type z from 'zod';
+import type { ArticleDto } from '~/core/article/usecase/+dto';
 import { ArticleContent, ArticleId, ArticleTitle } from '~/core/article/value-object';
 import { TenantId } from '~/core/tenant/value-object';
 import { UserId } from '~/core/user/value-object';
@@ -40,7 +42,7 @@ describe('ArticleRepository', () => {
       // コメントも作成
       const commentAuthor = await UserFactory.createActive({ tenant });
 
-      await CommentFactory.create({
+      const comment = await CommentFactory.create({
         tenant: {
           connect: tenant,
         },
@@ -59,17 +61,31 @@ describe('ArticleRepository', () => {
       );
 
       // Assert
-      assert.isNotNull(result);
-      expect(result.id).toBe(article.id);
-      expect(result.title).toBe('テスト記事');
-      expect(result.content).toBe('テスト記事の内容');
-      expect(result.author.status).toBe('ACTIVE');
-      expect(result.author.name).toBe(author.name);
-      expect(result.comments).toHaveLength(1);
-      const firstComment = result.comments[0];
-      assert.isDefined(firstComment);
-      expect(firstComment.content).toBe('テストコメント');
-      expect(firstComment.author.name).toBe(commentAuthor.name);
+      expect(result).toEqual({
+        id: article.id,
+        title: 'テスト記事',
+        content: 'テスト記事の内容',
+        createdAt: article.createdAt,
+        updatedAt: article.updatedAt,
+        author: {
+          id: author.id,
+          status: 'ACTIVE',
+          name: author.name,
+          email: author.active.email,
+        },
+        comments: [
+          {
+            id: comment.id,
+            content: 'テストコメント',
+            author: {
+              id: commentAuthor.id,
+              status: 'ACTIVE',
+              name: commentAuthor.name,
+              email: commentAuthor.active.email,
+            },
+          },
+        ],
+      } as const satisfies z.input<typeof ArticleDto>);
     });
 
     repeatTestWithTruncate('存在しない記事IDの場合はnullを返す', async () => {
