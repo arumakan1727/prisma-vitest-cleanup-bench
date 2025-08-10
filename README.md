@@ -61,7 +61,7 @@ TEST_REPEAT_COUNT=10 pnpm test:C
 task test-files:copy
 ```
 
-これにより、`src/infrastructure/postgres/__test__/**/*.test.ts` がファイルごとに `{name}_copy{i}.test.ts` の形式で 10 回複製される。
+これにより、`src/infrastructure/postgres/__test__/**/*.test.ts` がファイルごとに `{name}_copy{i}.test.ts` の形式で 20 回複製される。
 
 その後は test:A, test:B, test:C を同様に実行すればよい。
 ただし、方法 A は並列実行するとうまくいかないので、成功させるには以下のように --maxWorkers 1 を指定する必要がある。

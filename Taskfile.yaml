@@ -17,7 +17,7 @@ tasks:
 
   test-files:copy:
     desc: Copy each test files 10 times (For emulating multiple test files)
-    cmd: ./scripts/copy-test-files.ts copy ./src/infrastructure/postgres/__test__ 10
+    cmd: ./scripts/copy-test-files.ts copy ./src/infrastructure/postgres/__test__ 20
 
   test-files:remove:
     desc: Remove copied test files
