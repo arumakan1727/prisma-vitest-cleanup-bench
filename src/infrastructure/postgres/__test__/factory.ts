@@ -1,4 +1,5 @@
 import type { PrismaClient } from '@prisma/client';
+import type { ITXClientDenyList } from '@prisma/client/runtime/library';
 import { bypassRlsPrisma } from './bypass-rls-prisma';
 import {
   defineArticleFactory,
@@ -10,9 +11,9 @@ import {
   initialize,
 } from './fabbrica.gen';
 
-export const setFactoryPrismaClient = (prisma: PrismaClient) => {
+export const setFactoryPrismaClient = (prisma: Omit<PrismaClient, ITXClientDenyList>) => {
   initialize({
-    prisma: () => prisma,
+    prisma: () => prisma as PrismaClient,
   });
 };
 

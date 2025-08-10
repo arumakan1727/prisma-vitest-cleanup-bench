@@ -35,6 +35,17 @@ export default defineConfig({
           globalSetup: './src/infrastructure/postgres/__test__/B_each-tx-rollback/+global-setup.ts',
         },
       },
+      {
+        extends: true,
+        test: {
+          name: 'C',
+          include: ['src/infrastructure/postgres/__test__/C_pglite-each-tx-rollback/**/*.test.ts'],
+          setupFiles:
+            './src/infrastructure/postgres/__test__/C_pglite-each-tx-rollback/+each-file-setup.ts',
+          globalSetup:
+            './src/infrastructure/postgres/__test__/C_pglite-each-tx-rollback/+global-setup.ts',
+        },
+      },
     ],
   },
 });
