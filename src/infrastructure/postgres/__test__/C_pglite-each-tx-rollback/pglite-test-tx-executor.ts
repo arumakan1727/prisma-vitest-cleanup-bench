@@ -7,9 +7,12 @@ import { PrismaPGlite } from 'pglite-prisma-adapter';
 import { TenantId } from '~/core/tenant/value-object';
 import { type PrismaReadWriteTxHandle, PrismaTxExecutor } from '../../prisma';
 import { setFactoryPrismaClient } from '../factory';
+import { testEnv } from '../test-env';
 import {
+  applyMigrations,
   MAIN_TENANT_ID,
   OTHER_TENANT_ID,
+  prepareTenants,
   TEST_PGLITE_MIGRATION_SNAPSHOT_PATH,
 } from './+global-setup';
 
@@ -22,22 +25,33 @@ const createPGlitePrismaSingleton = () => {
   const getPGlitePrisma = async () => {
     if (instance) return instance;
 
-    console.log(
-      'createPGlitePrismaSingleton::getPGlitePrisma: loading snapshot from',
-      TEST_PGLITE_MIGRATION_SNAPSHOT_PATH
-    );
-    const buffer = await fs.readFile(TEST_PGLITE_MIGRATION_SNAPSHOT_PATH);
-    const snapshotBlob = new Blob([new Uint8Array(buffer)]);
+    if (testEnv.METHOD_C_DB_INIT_STRATEGY === 'snapshot') {
+      console.log(
+        'createPGlitePrismaSingleton::getPGlitePrisma: loading snapshot from',
+        TEST_PGLITE_MIGRATION_SNAPSHOT_PATH
+      );
+      const buffer = await fs.readFile(TEST_PGLITE_MIGRATION_SNAPSHOT_PATH);
+      const snapshotBlob = new Blob([new Uint8Array(buffer)]);
 
-    pg ??= new PGlite({
-      dataDir: 'memory://',
-      extensions: { citext },
-      loadDataDir: snapshotBlob,
-      username: 'app',
-    });
+      pg ??= new PGlite({
+        dataDir: 'memory://',
+        extensions: { citext },
+        loadDataDir: snapshotBlob,
+        username: 'app',
+      });
+    } else {
+      pg ??= new PGlite({
+        dataDir: 'memory://',
+        extensions: { citext },
+      });
+      await applyMigrations(pg);
+    }
 
     const adapter = new PrismaPGlite(pg);
     instance = new PrismaClient({ adapter, log: ['query', 'info', 'warn', 'error'] });
+    if (testEnv.METHOD_C_DB_INIT_STRATEGY === 'applyMigrationsEveryTest') {
+      await prepareTenants(instance);
+    }
     return instance;
   };
 
