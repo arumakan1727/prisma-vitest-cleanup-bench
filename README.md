@@ -33,7 +33,9 @@ task db:migrate:deploy
 README 冒頭で示した各種クリーンアップ方法によるテストは以下コマンドで実行可能。
 
 ```bash
-pnpm test:A
+pnpm test:A:truncate
+
+pnpm test:A:deleteMany
 
 pnpm test:B
 
@@ -44,17 +46,14 @@ pnpm test:C
 it() の中で N 回処理を繰り返すシンプルな実装。
 
 ```bash
-TEST_REPEAT_COUNT=10 pnpm test:A
+TEST_REPEAT_COUNT=10 pnpm test:A:truncate
+
+TEST_REPEAT_COUNT=10 pnpm test:A:deleteMany
 
 TEST_REPEAT_COUNT=10 pnpm test:B
 
 TEST_REPEAT_COUNT=10 pnpm test:C
 ```
-
-`test:A` において、各テストケース後のクリーンアップ処理の実装は環境変数 `METHOD_A_DELETION_STRATEGY` で指定できる。
-
-- `METHOD_A_DELETION_STRATEGY=truncate` を設定すれば `TRUNCATE TABLE "tenants" CASCADE`
-- `METHOD_A_DELETION_STRATEGY=deleteMany` を設定すれば `DELETE FROM "tenants"`
 
 複数のテストファイルを想定した並列テストを実行するには、まず下記コマンドでテストファイルを複製する。
 
@@ -70,7 +69,8 @@ task test-files:copy
 ```bash
 # 方法Aは並列実行するとクリーンアップ処理が他のテストで作成したデータを消してしまい、テストが失敗する。
 # --maxWorkers 1 を指定することで、テストを逐次実行する。
-pnpm test:A --maxWorkers 1
+pnpm test:A:truncate --maxWorkers 1
+pnpm test:A:deleteMany --maxWorkers 1
 pnpm test:B --maxWorkers 1
 pnpm test:C --maxWorkers 1
 ```

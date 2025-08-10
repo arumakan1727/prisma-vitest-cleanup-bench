@@ -9,7 +9,8 @@
     "fix": "biome check --write",
     "fix:unsafe": "biome check --write --unsafe",
     "typechk": "tsc --noEmit",
-    "test:A": "vitest run --project A",
+    "test:A:truncate": "METHOD_A_DELETION_STRATEGY=truncate vitest run --project A",
+    "test:A:deleteMany": "METHOD_A_DELETION_STRATEGY=deleteMany vitest run --project A",
     "test:B": "vitest run --project B",
     "test:C": "vitest run --project C"
   },
