@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a TypeScript benchmarking project that tests different database cleanup strategies for infrastructure layer repository tests using Prisma ORM with PostgreSQL. The project compares three approaches:
 - Method A: Transaction per test case with commit + TRUNCATE TABLE CASCADE
 - Method B: Transaction per test case with rollback (supports parallel execution)
-- Method C: Single transaction with SAVEPOINT/ROLLBACK for each test (no parallel execution)
+- Method C: In-memory PGlite with transaction per test case + rollback (supports parallel execution)
 
 ## Commands
 
@@ -54,12 +54,18 @@ pnpm vitest run [pattern]
   - `admin`: Superuser with RLS bypass (for migrations and tests)
   - `app`: Regular user with RLS enforcement
 - Separate databases for development, shadow, and testing
+- Method C uses PGlite (embedded PostgreSQL) for in-memory testing
+  - Dependencies: `@electric-sql/pglite` and `pglite-prisma-adapter`
 
 ### Testing Strategy
 The project implements three test database cleanup approaches in separate directories:
 - `A_each-commit-truncate/`: Tests run in transactions that commit, then TRUNCATE CASCADE
 - `B_each-tx-rollback/`: Each test runs in a transaction that rolls back
-- `C_single-tx-each-savepoint/`: Single transaction with savepoints for each test
+- `C_pglite-each-tx-rollback/`: Uses in-memory PGlite database with transaction rollback per test
+  - PGlite is an embedded PostgreSQL that runs entirely in memory
+  - Migrations are applied once in global setup and saved as a snapshot (tgz file)
+  - Each test file loads the snapshot to start with a clean migrated database
+  - Test isolation is achieved through transaction rollback (same as Method B)
 
 ### Environment Variables
 Required environment variables (see compose.yml and env.ts):
