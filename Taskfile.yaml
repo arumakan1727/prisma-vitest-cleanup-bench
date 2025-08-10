@@ -9,3 +9,24 @@ includes:
     taskfile: Taskfile.container.yaml
     vars:
       DOCKER: docker
+
+tasks:
+  install:
+    desc: Install dependencies
+    cmd: pnpm i
+
+  db:migrate:status:
+    desc: Show migration status
+    cmd: pnpm prisma migrate status
+
+  db:migrate:deploy:
+    desc: Deploy migration scripts
+    cmd: pnpm prisma migrate deploy
+
+  db:migrate:gen:
+    desc: Generate migrations
+    cmd: pnpm prisma migrate dev --create-only
+
+  db:gen:
+    desc: Generate Prisma client
+    cmd: pnpm prisma generate
