@@ -26,7 +26,8 @@ const createPGlitePrismaSingleton = () => {
       'createPGlitePrismaSingleton::getPGlitePrisma: loading snapshot from',
       TEST_PGLITE_MIGRATION_SNAPSHOT_PATH
     );
-    const snapshotBlob = new Blob([await fs.readFile(TEST_PGLITE_MIGRATION_SNAPSHOT_PATH)]);
+    const buffer = await fs.readFile(TEST_PGLITE_MIGRATION_SNAPSHOT_PATH);
+    const snapshotBlob = new Blob([new Uint8Array(buffer)]);
 
     pg ??= new PGlite({
       dataDir: 'memory://',
