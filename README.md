@@ -55,3 +55,28 @@ TEST_REPEAT_COUNT=10 pnpm test:C
 
 - `METHOD_A_DELETION_STRATEGY=truncate` を設定すれば `TRUNCATE TABLE "tenants" CASCADE`
 - `METHOD_A_DELETION_STRATEGY=deleteMany` を設定すれば `DELETE FROM "tenants"`
+
+複数のテストファイルを想定した並列テストを実行するには、まず下記コマンドでテストファイルを複製する。
+
+```bash
+task test-files:copy
+```
+
+これにより、`src/infrastructure/postgres/__test__/**/*.test.ts` がファイルごとに `{name}_copy{i}.test.ts` の形式で 10 回複製される。
+
+その後は test:A, test:B, test:C を同様に実行すればよい。
+ただし、方法 A は並列実行するとうまくいかないので、成功させるには以下のように --maxWorkers 1 を指定する必要がある。
+
+```bash
+# 方法Aは並列実行するとクリーンアップ処理が他のテストで作成したデータを消してしまい、テストが失敗する。
+# --maxWorkers 1 を指定することで、テストを逐次実行する。
+pnpm test:A --maxWorkers 1
+pnpm test:B --maxWorkers 1
+pnpm test:C --maxWorkers 1
+```
+
+複製されたテストファイルを削除するには下記コマンドを実行する。
+
+```bash
+task test-files:remove
+```

@@ -15,6 +15,14 @@ tasks:
     desc: Install dependencies
     cmd: pnpm i
 
+  test-files:copy:
+    desc: Copy each test files 10 times (For emulating multiple test files)
+    cmd: ./scripts/copy-test-files.ts copy ./src/infrastructure/postgres/__test__ 10
+
+  test-files:remove:
+    desc: Remove copied test files
+    cmd: ./scripts/copy-test-files.ts remove ./src/infrastructure/postgres/__test__
+
   db:migrate:status:
     desc: Show migration status
     cmd: pnpm prisma migrate status
