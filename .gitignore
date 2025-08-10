@@ -1,4 +1,5 @@
 fabbrica.gen
+*_copy*.test.ts
 
 node_modules
 dist/
