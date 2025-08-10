@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 This is a TypeScript benchmarking project that tests different database cleanup strategies for infrastructure layer repository tests using Prisma ORM with PostgreSQL. The project compares three approaches:
-- Method A: Transaction per test case with commit + TRUNCATE TABLE CASCADE
+- Method A: Transaction per test case with commit + {TRUNCATE TABLE CASCADE or DELETE}
 - Method B: Transaction per test case with rollback (supports parallel execution)
 - Method C: In-memory PGlite with transaction per test case + rollback (supports parallel execution)
 

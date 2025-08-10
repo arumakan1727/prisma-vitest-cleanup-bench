@@ -2,7 +2,7 @@
 
 ## 目的
 - インフラストラクチャ層のリポジトリクラスのテストをする。テストケースごとの DB レコードのクリーンアップをするにあたり、どのような手法がよいかベンチマークをとる。
-    - 方法 A: 各テストケースごとに tx を発行 & コミット + TRUNCATE TABLE CASCADE
+    - 方法 A: 各テストケースごとに tx を発行 & コミット + {TRUNCATE TABLE CASCADE / DELETE}
     - 方法 B: 各テストケースごとに tx を発行 & ロールバック (並列実行可能)
     - 方法 C: オンメモリの PGlite を使用 (クリーンアップは方法 B と同様 tx 発行 & ロールバック)
 
@@ -50,3 +50,8 @@ TEST_REPEAT_COUNT=10 pnpm test:B
 
 TEST_REPEAT_COUNT=10 pnpm test:C
 ```
+
+`test:A` において、各テストケース後のクリーンアップ処理の実装は環境変数 `METHOD_A_DELETION_STRATEGY` で指定できる。
+
+- `METHOD_A_DELETION_STRATEGY=truncate` を設定すれば `TRUNCATE TABLE "tenants" CASCADE`
+- `METHOD_A_DELETION_STRATEGY=deleteMany` を設定すれば `DELETE FROM "tenants"`

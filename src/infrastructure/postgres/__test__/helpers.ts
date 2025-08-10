@@ -1,5 +1,5 @@
 import { it } from 'vitest';
-import { truncate } from './bypass-rls-prisma';
+import { bypassRlsPrisma, truncate } from './bypass-rls-prisma';
 import { testEnv } from './test-env';
 
 /**
@@ -14,12 +14,17 @@ export const repeatTest = (name: string, fn: () => Promise<void>) => {
   });
 };
 
-export const repeatTestWithTruncate = (name: string, fn: () => Promise<void>) => {
+export const deleteAll =
+  testEnv.METHOD_A_DELETION_STRATEGY === 'deleteMany'
+    ? bypassRlsPrisma.tenant.deleteMany
+    : truncate;
+
+export const repeatTestWithDelete = (name: string, fn: () => Promise<void>) => {
   it(name, async () => {
     for (let i = 0; i < testEnv.TEST_REPEAT_COUNT; i++) {
       await fn();
       if (i < testEnv.TEST_REPEAT_COUNT - 1) {
-        await truncate();
+        await deleteAll();
       }
     }
   });
