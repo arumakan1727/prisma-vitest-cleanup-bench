@@ -29,6 +29,7 @@
     "@quramy/prisma-fabbrica": "^2.3.0",
     "@types/node": "^24.2.0",
     "execa": "^9.6.0",
+    "glob": "^11.0.3",
     "pglite-prisma-adapter": "^0.6.1",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^5.1.4",
